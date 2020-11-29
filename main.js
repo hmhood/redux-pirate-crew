@@ -51,7 +51,11 @@ const walkPlank = () => {
 }
 
 walkPlankButton.addEventListener("click", () => {
-  store.dispatch(walkPlank())
+  if (store.getState().crewMembers.length === 0) {
+    alert('This crew has no pirates!')
+  } else {
+    store.dispatch(walkPlank())
+  }
 })
 
 const store = createStore(crewMemberReducer);
