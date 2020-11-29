@@ -2,7 +2,7 @@ const { createStore } = Redux;
 
 const initialState = {
   crewMembers: [],
-  walkedPlank: []
+  walkedPlank: [],
 };
 
 const crewMemberReducer = (state = initialState, action) => {
@@ -13,11 +13,11 @@ const crewMemberReducer = (state = initialState, action) => {
         crewMembers: newCrewArray,
       });
     case WALK_PLANK:
-      const crewToWalkPlank = state.crewMembers.shift()
-      const newCrewWalkedArray = state.walkedPlank.concat(crewToWalkPlank)
+      const crewToWalkPlank = state.crewMembers.shift();
+      const newCrewWalkedArray = state.walkedPlank.concat(crewToWalkPlank);
       return Object.assign({}, state, {
-        walkedPlank: newCrewWalkedArray
-      })
+        walkedPlank: newCrewWalkedArray,
+      });
     default:
       return state;
   }
@@ -35,33 +35,37 @@ const addCrewMember = (newCrewMember) => {
 
 newCrewForm.addEventListener("submit", () => {
   event.preventDefault();
-  const crewName = document.getElementById("name").value;
-  document.getElementById("name").value = "";
-  const newCrewMember = { name: crewName };
-  store.dispatch(addCrewMember(newCrewMember));
+  if (document.getElementById("name").value.trim() === "") {
+    alert("Your crew member needs a name!");
+  } else {
+    const crewName = document.getElementById("name").value;
+    document.getElementById("name").value = "";
+    const newCrewMember = { name: crewName };
+    store.dispatch(addCrewMember(newCrewMember));
+  }
 });
 
-const walkPlankButton = document.getElementById('walk-the-plank')
+const walkPlankButton = document.getElementById("walk-the-plank");
 
-const WALK_PLANK = 'WALK_PLANK'
+const WALK_PLANK = "WALK_PLANK";
 const walkPlank = () => {
   return {
-    type: WALK_PLANK
-  }
-}
+    type: WALK_PLANK,
+  };
+};
 
 walkPlankButton.addEventListener("click", () => {
   if (store.getState().crewMembers.length === 0) {
-    alert('This crew has no pirates!')
+    alert("This crew has no pirates to walk the plank!");
   } else {
-    store.dispatch(walkPlank())
+    store.dispatch(walkPlank());
   }
-})
+});
 
 const store = createStore(crewMemberReducer);
 const crewList = document.getElementById("current-crew");
-const walkedPlankList = document.getElementById("walked-crew")
-const numberWalked = document.getElementById("plank-walkers")
+const walkedPlankList = document.getElementById("walked-crew");
+const numberWalked = document.getElementById("plank-walkers");
 
 const render = () => {
   let newCrewList = "";
@@ -70,14 +74,14 @@ const render = () => {
   });
   crewList.innerHTML = newCrewList;
 
-  let newWalkedPlankList = ""
+  let newWalkedPlankList = "";
   store.getState().walkedPlank.forEach((crewMember) => {
-    newWalkedPlankList += `<li>${crewMember.name}</li>`
-  })
-  walkedPlankList.innerHTML = newWalkedPlankList
+    newWalkedPlankList += `<li>${crewMember.name}</li>`;
+  });
+  walkedPlankList.innerHTML = newWalkedPlankList;
 
-  let plankWalkers = store.getState().walkedPlank.length
-  numberWalked.innerHTML = plankWalkers
+  let plankWalkers = store.getState().walkedPlank.length;
+  numberWalked.innerHTML = plankWalkers;
 };
 
 render();
