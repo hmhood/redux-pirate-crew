@@ -2,9 +2,9 @@ const { createStore } = Redux;
 
 const initialState = {
   crewMembers: [],
+  walkedPlank: []
 };
 
-//Reducer
 const crewMemberReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_CREW_MEMBER:
@@ -12,6 +12,12 @@ const crewMemberReducer = (state = initialState, action) => {
       return Object.assign({}, state, {
         crewMembers: newCrewArray,
       });
+    case WALK_PLANK:
+      const crewToWalkPlank = state.crewMembers.shift()
+      const newCrewWalkedArray = state.walkedPlank.concat(crewToWalkPlank)
+      return Object.assign({}, state, {
+        walkedPlank: newCrewWalkedArray
+      })
     default:
       return state;
   }
@@ -20,8 +26,6 @@ const crewMemberReducer = (state = initialState, action) => {
 const newCrewForm = document.getElementById("new-pirate-form");
 
 const ADD_CREW_MEMBER = "ADD_CREW_MEMBER";
-
-//Action creator
 const addCrewMember = (newCrewMember) => {
   return {
     type: ADD_CREW_MEMBER,
@@ -29,7 +33,6 @@ const addCrewMember = (newCrewMember) => {
   };
 };
 
-//Event listener
 newCrewForm.addEventListener("submit", () => {
   event.preventDefault();
   const crewName = document.getElementById("name").value;
@@ -38,11 +41,23 @@ newCrewForm.addEventListener("submit", () => {
   store.dispatch(addCrewMember(newCrewMember));
 });
 
-//Setup store
-const store = createStore(crewMemberReducer);
+const walkPlankButton = document.getElementById('walk-the-plank')
 
-//Renders list of crew members to page
+const WALK_PLANK = 'WALK_PLANK'
+const walkPlank = () => {
+  return {
+    type: WALK_PLANK
+  }
+}
+
+walkPlankButton.addEventListener("click", () => {
+  store.dispatch(walkPlank())
+})
+
+const store = createStore(crewMemberReducer);
 const crewList = document.getElementById("current-crew");
+const walkedPlankList = document.getElementById("walked-crew")
+const numberWalked = document.getElementById("plank-walkers")
 
 const render = () => {
   let newCrewList = "";
@@ -50,6 +65,15 @@ const render = () => {
     newCrewList += `<li>${crewMember.name}</li>`;
   });
   crewList.innerHTML = newCrewList;
+
+  let newWalkedPlankList = ""
+  store.getState().walkedPlank.forEach((crewMember) => {
+    newWalkedPlankList += `<li>${crewMember.name}</li>`
+  })
+  walkedPlankList.innerHTML = newWalkedPlankList
+
+  let plankWalkers = store.getState().walkedPlank.length
+  numberWalked.innerHTML = plankWalkers
 };
 
 render();
